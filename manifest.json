@@ -1,0 +1,23 @@
+{
+    "name": "Wordle Share",
+    "version": "1.0",
+    "short_name": "WordleScore",
+    "description": "Easily share and track your Wordle scores",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4CAF50",
+    "icons": [
+        {
+            "src": "icon.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ],
+    "permissions": [
+        "activeTab"
+    ],
+    "scope": "/",
+    "orientation": "portrait",
+    "prefer_related_applications": false
+}
