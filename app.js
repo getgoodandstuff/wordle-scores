@@ -19,6 +19,7 @@ async function readClipboard() {
     try {
         const text = await navigator.clipboard.readText();
         console.log('Clipboard contents:', text);
+        document.getElementById('score-input').value = text;
     } catch (err) {
         console.error('Clipboard read failed:', err);
     }
