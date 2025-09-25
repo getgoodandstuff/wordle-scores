@@ -30,6 +30,7 @@ textareaEl.addEventListener('paste', (e) => {
 document.getElementById('submit-score').addEventListener('click', submit);
 
 async function submit() {
+    //**ADD*CONFIRM THAT THE SUBMISSION IS FOR THE CURRENT DAY***/
     //can only submit the score if text is empty
     if (textareaEl.value == "") {
         try {
@@ -63,16 +64,20 @@ const dateObj = new Date();
 //Updates the date to change it while running
 setInterval(() => {
     checkIfNewDay();
+    console.log(dateObj.getMinutes());
+    console.log(dateObj.getSeconds());
+    console.log(dateObj.getMilliseconds());
 }, 60000);
 //Checks if the date is different
 checkIfNewDay();
 function checkIfNewDay() {
-    if (dateObj.toDateString() !== localStorage.getItem('lastSeenDate')) {
-        localStorage.setItem('lastSeenDate', dateObj.toDateString());
+    const now = new Date(); // Get current date and time
+    if (now.toDateString() !== localStorage.getItem('lastSeenDate')) {
+        localStorage.setItem('lastSeenDate', now.toDateString());
         console.log("Updated Date!");
-        console.log(dateObj.getHours());
-        console.log(dateObj.getMinutes());
-        console.log(dateObj.getSeconds());
+        console.log(now.getHours());
+        console.log(now.getMinutes());
+        console.log(now.getSeconds());
         //RESET THE INPUT
         resultEl.innerText = "";
         textareaEl.value = "";
@@ -82,13 +87,14 @@ function checkIfNewDay() {
 
 //Updates the screens date
 function displayDate() {
+    const now = new Date(); // Get current date and time
     //0-11
     //month
     //1-31
     //day;
     //0-6
     //week
-    switch (dateObj.getDay()) {
+    switch (now.getDay()) {
         case 0:
             dateEl.innerText = "Sunday, ";
             break;
@@ -115,7 +121,7 @@ function displayDate() {
             break;
     }
 
-    switch (dateObj.getMonth()) {
+    switch (now.getMonth()) {
         case 0:
             dateEl.innerText += " January";
             break;
@@ -155,6 +161,23 @@ function displayDate() {
         default:
             dateEl.innerText += " No month found"
     }
-    dateEl.innerText += (" " + dateObj.getDate().toString());
+    dateEl.innerText += (" " + now.getDate().toString() + " " + now.getFullYear().toString());
 }
 
+//calculate time difference
+function timeAgo(date) {
+    const now = new Date(); // Get current date and time
+    const diffTime = now - new Date(date); // Difference in milliseconds
+
+    // Calculate the difference in various units
+    const seconds = Math.floor(diffTime / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    // Return a readable format
+    if (days > 0) return `${days} days ago`;
+}
+
+const someDate = "2023-09-18"; // Date format: YYYY-MM-DD
+console.log(timeAgo(someDate)); // Output will depend on the current date
