@@ -13,3 +13,13 @@ document.getElementById('submit-score').addEventListener('click', function () {
     }
 });
 
+document.getElementById('check-for-score').addEventListener('click', readClipboard);
+
+async function readClipboard() {
+    try {
+        const text = await navigator.clipboard.readText();
+        console.log('Clipboard contents:', text);
+    } catch (err) {
+        console.error('Clipboard read failed:', err);
+    }
+}
