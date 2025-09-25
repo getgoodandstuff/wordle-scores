@@ -2,3 +2,11 @@ body {
     margin: 0 auto;
     padding: 0;
 }
+
+textarea {
+    width: 140px;
+    height: 140px;
+    resize: none;
+    text-align: center;
+    margin: 10px;
+}
