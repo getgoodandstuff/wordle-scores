@@ -11,13 +11,35 @@
 </head>
 
 <body>
-    <h1>Share Your Wordle Score</h1>
-    <p id="date-display"></p>
-    <textarea id="score-input" placeholder="Paste your Wordle score here"></textarea>
-    <button id="submit-score">Submit Score</button>
-    <div id="result"></div>
+    <div id="scores-screen">
+        <h1 id="score-screen-header">Share Your Wordle Score</h1>
+        <p id="date-display"></p>
+        <textarea id="score-input" placeholder="Paste your Wordle score here"></textarea>
+        <button id="submit-score">Submit Score</button>
+        <div id="result"></div>
+    </div>
+    <div id="sign-up-screen">
+        <h2 id="sign-up-header">Create Account</h2>
+        <p>Enter your email</p>
+        <input type="email" id="emailInput" placeholder="email" autocomplete="email">
+        <p>Enter a display name</p>
+        <input type="text" id="usernameInput" placeholder="name">
+        <p>Create a password</p>
+        <input type="password" id="passwordInput" placeholder="password"><button id="toggle-password">Show
+            Password</button>
+        <p id="sign-up-result"></p>
+        <button id="sign-up-button">Sign Up</button>
+    </div>
+    <div id="join-group-screen">
+        <div id="group-container">
+            <p id="verification-blocker-text">verify email to view</p>
+            <button id="check-verification-button">check verification</button>
+            <button id="resend-verification-button">resend verification</button>
+            <p id="check-verification-output"></p>
+        </div>
+    </div>
 
-    <script src="app.js"></script>
+    <script src="app.js" type="module"></script>
 </body>
 
 </html>

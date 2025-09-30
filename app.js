@@ -1,3 +1,232 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, setDoc, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+//ADD** email/password account
+//Just need to update lastseen on visibility true
+//make them verifyemail to join a group
+//Last but not least find out how to display others' scores
+//service workeres/?????
+//service workers offline persisstance vs firestore offline persisstnace
+//Score collection, make public
+
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+    apiKey: "AIzaSyCc6qatLXxL-cnN-rhnz0yQPBn7HXfOmvg",
+    authDomain: "wordlescores-76ebb.firebaseapp.com",
+    projectId: "wordlescores-76ebb",
+    storageBucket: "wordlescores-76ebb.firebasestorage.app",
+    messagingSenderId: "170645657035",
+    appId: "1:170645657035:web:08b1c755a2878df833124e",
+    measurementId: "G-DHYJP8VZR6"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// Check if service workers are supported
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker
+            .register('/service-worker.js')  // Path to the service worker file
+            .then((registration) => {
+                console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch((error) => {
+                console.log('Service Worker registration failed:', error);
+            });
+    });
+}
+
+//enables firestore offline persistence
+// firebase.firestore().enablePersistence()
+//   .catch((err) => {
+//     if (err.code === 'failed-precondition') {
+//       // Handle cases where the browser doesn't support multiple tabs
+//       console.error("Persistence failed: multiple tabs open");
+//     } else if (err.code === 'unimplemented') {
+//       // Handle unsupported browsers
+//       console.error("Persistence is not available in this browser");
+//     }
+//   });
+
+//call on log in to check if verified
+const checkEmailVerification = async () => {
+    const user = auth.currentUser;
+    if (user) {
+        // Refresh the user to get the latest verification status
+        await user.reload();
+
+        if (user.emailVerified) {
+            // Verified!
+            document.getElementById('check-verification-output').innerText = "Verified!";
+            console.log("Email verified, user document updated.");
+            //Allow joining of groupps!
+        } else {
+            document.getElementById('check-verification-output').innerText = "Not Verified.";
+            console.log("Email not verified yet.");
+        }
+    }
+};
+
+// Function to add a new user
+//const email = "user@example.com";
+//const password = "userPassword123";
+//const username = "johndoe";
+// Call the function to create the user, send verification email, and add them to Firestore
+//signUpAndVerify(email, password, username);
+const signUpAndVerify = async (email, password, displayName) => {
+    try {
+        //Creating the user with the email and password
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        //send verification email
+        await sendEmailVerification(user);
+        console.log("Verification email sent");
+
+        //Store user data
+        await setDoc(doc(db, "users", user.uid), {
+            displayName: displayName,
+            lastSeenDate: new Date(),
+        });
+        console.log("The email: " + email + " has been used to sign in " + displayName + " with the password of " + password);
+        console.log("User document created for UID:", user.uid);
+        document.getElementById('sign-up-screeen').style.display = 'none';
+        document.getElementById('join-group-screen').style.display = 'flex';
+        // document.getElementById('check-verification-button').addEventListener('click', checkEmailVerification);
+
+    } catch (error) {
+        document.getElementById('sign-up-result').innerText = error.message;
+        console.error("Error creating user:", error);
+    }
+};
+
+//Check if User is not logged in or in group
+checkIfNotLoggedIn();
+function checkIfNotLoggedIn() {
+    console.log(auth);
+    const user = auth.currentUser;
+    console.log(auth.currentUser);
+    // no logged in user
+    if (!user) {
+        console.log("no logged in user");
+        //prompts sign in screen
+        document.getElementById('sign-up-screen').style.display = 'flex';
+        document.getElementById("toggle-password").addEventListener("click", () => {
+            const isPassword = document.getElementById("passwordInput").type === "password";
+            document.getElementById("passwordInput").type = isPassword ? "text" : "password";
+            document.getElementById("toggle-password").textContent = isPassword ? "Hide Password" : "Show Password";
+        });
+        //sign in button push
+        document.getElementById('sign-up-button').addEventListener('click', () => {
+            if (document.getElementById('emailInput').value != "" && document.getElementById('usernameInput').value != "" && document.getElementById('passwordInput').value != "") {
+                console.log("signing up!");
+                //sign in and verify
+                signUpAndVerify(document.getElementById('emailInput').value, document.getElementById('passwordInput').value, document.getElementById('usernameInput').value);
+            } else {
+                document.getElementById('sign-up-result').innerText = "Must enter stuff better.";
+            }
+        });
+    }
+    else {
+        console.log("user is here" + user.uid);
+        getData();
+    }
+}
+//function to read data
+async function getData() {
+    const user = auth.currentUser;
+
+    if (!user) {
+        console.log("No user is signed in.");
+        return;
+    }
+
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+        const data = userDocSnap.data();
+        console.log("User data:", data);
+        // You can now use data.username, data.createdAt, etc.
+    } else {
+        console.log("No document found for this user.");
+    }
+
+}
+
+// Function to update a user's details
+//updateUser("USER_ID", { score: "", grid: ""});
+//updateUsers display name and emailVerified
+async function updateUser(updatedData) {
+    const user = auth.currentUser;
+    const userDoc = doc(db, "users", user.uid);
+
+    try {
+        await updateDoc(userDoc, updatedData);
+        console.log("User updated!");
+    } catch (error) {
+        console.error("Error updating user: ", error);
+    }
+}
+
+// Function to delete a user
+async function deleteUser(userId) {
+    const userDoc = doc(db, "users", userId);
+
+    try {
+        await deleteDoc(userDoc);
+        console.log("User deleted!");
+    } catch (error) {
+        console.error("Error deleting user: ", error);
+    }
+}
+
+onAuthStateChanged(auth, (user) => {
+    console.log(user);
+    if (user) {
+        // const uid = user.uid;
+        //document.getElementById("userId").innerText = `User ID: ${uid}`;
+        console.log("User ID:", user.uid);
+        document.getElementById("sign-up-screen").style.display = 'none';
+        document.getElementById("join-group-screen").style.display = 'flex';
+        document.getElementById('check-verification-button').addEventListener('click', checkEmailVerification);
+        document.getElementById('resend-verification-button').addEventListener('click', async () => {
+            try {
+                await sendEmailVerification(user);
+                console.log("Verification email sent");
+            }
+            catch (error) {
+                console.log("error sending verifyemail: ", error);
+            }
+        });
+
+        // Save some user data to Firestore
+        // const userRef = doc(db, "users", uid);
+        // addUser();
+    } else {
+        console.log("No User.");
+        //document.getElementById("userId").innerText = "Not signed in";
+    }
+});
+
+
+/*Wordle 1562 3/6
+//⬜⬜⬜⬜🟩
+//⬜⬜🟩⬜⬜
+//🟩🟩🟩🟩🟩
+*/
+
+
 const textareaEl = document.getElementById('score-input');
 const resultEl = document.getElementById('result');
 
@@ -26,11 +255,12 @@ textareaEl.addEventListener('paste', (e) => {
 
     }
 });
-
+//clicking submit score button
 document.getElementById('submit-score').addEventListener('click', submit);
 
 async function submit() {
     //**ADD*CONFIRM THAT THE SUBMISSION IS FOR THE CURRENT DAY***/
+    console.log(timeAgo("2021-06-19"));
     //can only submit the score if text is empty
     if (textareaEl.value == "") {
         try {
@@ -38,15 +268,21 @@ async function submit() {
             const pastedContent = await navigator.clipboard.readText();
             console.log(pastedContent);
             let splittedContent = pastedContent.split(" ");
+            console.log(splittedContent);
             //checks if it's a wordle score
             if (splittedContent[0] == "Wordle" && splittedContent.length == 3) {
-                // Here, you can store or display the score in your app
-                textareaEl.value = pastedContent;
-                resultEl.textContent = `Your Wordle score: \n${pastedContent}`;
+                if (timeAgo("2021-06-19") == splittedContent[1]) {
+                    // Here, you can store or display the score in your app
+                    textareaEl.value = pastedContent;
+                    resultEl.textContent = `Your Wordle score: \n${pastedContent}`;
 
-                // Optionally, you could save it to a server or local storage
-                // Example: Save to localStorage
-                // localStorage.setItem('wordleScore', score);
+                    // Optionally, you could save it to a server or local storage
+                    // Example: Save to localStorage
+                    // localStorage.setItem('wordleScore', score);
+                }
+                else {
+                    resultEl.innerText = "This is not the right wordle for the day.";
+                }
             } else {
                 resultEl.innerText = "Copy your wordle score you silly goose! Then try pasting again.";
             }
@@ -59,17 +295,20 @@ async function submit() {
 
 //DATE MANAGEMENT
 const dateEl = document.getElementById('date-display');
-const dateObj = new Date();
+
+//updates the date when re enter app
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        //Checks if the date is different
+        checkIfNewDay();
+    }
+});
 
 //Updates the date to change it while running
-setInterval(() => {
-    checkIfNewDay();
-    console.log(dateObj.getMinutes());
-    console.log(dateObj.getSeconds());
-    console.log(dateObj.getMilliseconds());
-}, 60000);
-//Checks if the date is different
-checkIfNewDay();
+// setInterval(() => {
+//     checkIfNewDay();
+// }, 60000);
+
 function checkIfNewDay() {
     const now = new Date(); // Get current date and time
     if (now.toDateString() !== localStorage.getItem('lastSeenDate')) {
@@ -176,8 +415,5 @@ function timeAgo(date) {
     const days = Math.floor(hours / 24);
 
     // Return a readable format
-    if (days > 0) return `${days} days ago`;
+    if (days > 0) return days;
 }
-
-const someDate = "2023-09-18"; // Date format: YYYY-MM-DD
-console.log(timeAgo(someDate)); // Output will depend on the current date

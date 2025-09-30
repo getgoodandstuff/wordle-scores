@@ -1,6 +1,7 @@
 body {
-    margin: 0 auto;
+    margin: 0;
     padding: 0;
+    background-color: rgb(180, 255, 170);
 }
 
 textarea {
@@ -9,4 +10,86 @@ textarea {
     resize: none;
     text-align: center;
     margin: 10px;
+}
+
+#scores-screen {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+}
+
+#score-screen-header {
+    margin: 0;
+    padding: 20px;
+}
+
+#sign-up-screen {
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    /* flex */
+    align-items: center;
+    flex-direction: column;
+}
+
+#sign-up-header {
+    margin: 0;
+    padding: 10px;
+    font-size: 40px;
+}
+
+#sign-up-screen input {
+    height: 30px;
+    width: 200px;
+    font-size: 16px;
+}
+
+#sign-up-screen p {
+    font-size: 20px;
+}
+
+#sign-up-button {
+    height: 35px;
+    width: 75px;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: rgb(254, 253, 253);
+    margin-top: 50px;
+}
+
+#sign-up-button:hover {
+    background-color: rgb(200, 200, 200);
+}
+
+#toggle-password {
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: rgb(254, 253, 253);
+    margin-top: 1px;
+}
+
+#sign-up-result {
+    text-align: center;
+}
+
+#join-group-screen {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+}
+
+#group-container {
+    width: 300px;
+    height: 500px;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid black;
+    border-radius: 4px;
+}
+
+#verification-blocker-text {
+    text-align: center;
+    color: rgb(100, 100, 100);
 }
