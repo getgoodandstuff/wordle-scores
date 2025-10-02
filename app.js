@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, setDoc, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, setDoc, doc, getDoc, deleteDoc, Timestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -13,7 +13,7 @@ import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, onAuthS
 //service workeres/?????
 //service workers offline persisstance vs firestore offline persisstnace
 //Score collection, make public
-
+//I Think error occurs while creating data
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -96,7 +96,7 @@ const signUpAndVerify = async (email, password, displayName) => {
         //Store user data
         await setDoc(doc(db, "users", user.uid), {
             displayName: displayName,
-            lastSeenDate: new Date(),
+            lastSeenDate: Timestamp.now(),
         });
         console.log("The email: " + email + " has been used to sign in " + displayName + " with the password of " + password);
         console.log("User document created for UID:", user.uid);
@@ -110,6 +110,11 @@ const signUpAndVerify = async (email, password, displayName) => {
     }
 };
 
+document.getElementById('get-user-doc-button').addEventListener("click", () => {
+    console.log("starting to get data");
+    getData();
+    console.log("got Data successfully.");
+});
 //Check if User is not logged in or in group
 checkIfNotLoggedIn();
 function checkIfNotLoggedIn() {
