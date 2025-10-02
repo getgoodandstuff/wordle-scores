@@ -5,9 +5,9 @@ self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open('static-assets-v1.0.1').then((cache) => {
             return cache.addAll([
-                '/index.html',
-                '/app.js',
-                '/style.css',
+                '/wordle-scores/index.html',
+                '/wordle-scores/app.js',
+                '/wordle-scores/style.css',
                 // Add any other assets you want to cache
             ]);
         })
