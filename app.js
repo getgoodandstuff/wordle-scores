@@ -93,15 +93,36 @@ const signUpAndVerify = async (email, password, displayName) => {
         await sendEmailVerification(user);
         console.log("Verification email sent");
 
-        //Store user data
-        await setDoc(doc(db, "users", user.uid), {
-            displayName: displayName,
-            lastSeenDate: Timestamp.now(),
+        onAuthStateChanged(auth, async (confirmedUser) => {
+            if (confirmedUser && confirmedUser.uid === user.uid) {
+                try {
+                    // Now safe to write to Firestore
+                    await setDoc(doc(db, "users", confirmedUser.uid), {
+                        displayName: displayName,
+                        lastSeenDate: Timestamp.now(),
+                    });
+                    console.log("User document created for UID:", confirmedUser.uid);
+
+                    // 4. Continue UI changes
+                    document.getElementById('sign-up-screeen').style.display = 'none';
+                    document.getElementById('join-group-screen').style.display = 'flex';
+
+                } catch (firestoreError) {
+                    console.error("Firestore write failed:", firestoreError);
+                }
+            }
         });
-        console.log("The email: " + email + " has been used to sign in " + displayName + " with the password of " + password);
-        console.log("User document created for UID:", user.uid);
-        document.getElementById('sign-up-screeen').style.display = 'none';
-        document.getElementById('join-group-screen').style.display = 'flex';
+
+
+        //Store user data
+        // await setDoc(doc(db, "users", user.uid), {
+        //     displayName: displayName,
+        //     lastSeenDate: Timestamp.now(),
+        // });
+        // console.log("The email: " + email + " has been used to sign in " + displayName + " with the password of " + password);
+        // console.log("User document created for UID:", user.uid);
+        // document.getElementById('sign-up-screeen').style.display = 'none';
+        // document.getElementById('join-group-screen').style.display = 'flex';
         // document.getElementById('check-verification-button').addEventListener('click', checkEmailVerification);
 
     } catch (error) {
