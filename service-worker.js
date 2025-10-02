@@ -16,6 +16,9 @@ self.addEventListener('install', (event) => {
 
 // Fetch event: Serve cached assets or fetch from the network
 self.addEventListener('fetch', (event) => {
+    // Don't intercept Firebase API calls
+    if (event.request.url.includes('firestore.googleapis.com')) { console.log("service tried fetching firstore"); return };
+
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
             // Serve from cache if available, else fetch from network

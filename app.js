@@ -118,9 +118,7 @@ document.getElementById('get-user-doc-button').addEventListener("click", () => {
 //Check if User is not logged in or in group
 checkIfNotLoggedIn();
 function checkIfNotLoggedIn() {
-    console.log(auth);
     const user = auth.currentUser;
-    console.log(auth.currentUser);
     // no logged in user
     if (!user) {
         console.log("no logged in user");
