@@ -36,7 +36,7 @@ const auth = getAuth(app);
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker
-            .register('/service-worker.js')  // Path to the service worker file
+            .register('/wordle-scores/service-worker.js')  // Path to the service worker file
             .then((registration) => {
                 console.log('Service Worker registered with scope:', registration.scope);
             })
